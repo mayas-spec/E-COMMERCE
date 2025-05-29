@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="style.css" />
+    <title>E-COMMERCE</title>
+  </head>
+  <body>
+    <div class="container">
+      <h1>Product Management System</h1>
+
+      <!-- Add Product Form -->
+      <div class="form-section">
+        <div id="message" class="message"></div>
+
+        <form id="productForm">
+          <div class="form-group">
+            <label for="name">Product Name *</label>
+            <input type="text" id="name" required />
+          </div>
+
+          <div class="form-group">
+            <label for="description">Description *</label>
+            <textarea id="description" required></textarea>
+          </div>
+
+          <div class="form-group">
+            <label for="imageUrl">Image URL *</label>
+            <input type="url" id="imageUrl" required />
+          </div>
+
+          <div class="form-group">
+            <label for="price">Price ($) *</label>
+            <input type="number" id="price" step="0.01" min="0" required />
+          </div>
+
+          <div class="form-group">
+            <label for="category">Category</label>
+            <input type="text" id="category" />
+          </div>
+
+          <button type="submit">Add Product</button>
+          <button type="button" class="reset-btn" id="resetAllBtn">
+            Reset All Products
+          </button>
+        </form>
+      </div>
+
+      <!-- Products Display -->
+      <div class="products-section">
+        <h2>Products</h2>
+        <div id="loading" class="loading">Loading products...</div>
+        <div id="productsGrid" class="products-grid"></div>
+      </div>
+    </div>
+    <script src="script.js"></script>
+  </body>
+</html>
