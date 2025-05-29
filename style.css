@@ -17,9 +17,9 @@ body {
 
 h1 {
   text-align: center;
-  color: rgba(red, green, blue, alpha);
   margin-bottom: 30px;
-  -webkit-text-fill-color: #333;
+  -webkit-text-fill-color:rgba(2, 2, 2, 0.85);
+  font-weight: bolder;
 }
 
 /* Form Styles */
@@ -68,51 +68,20 @@ button {
 }
 
 button:hover {
-  background-color: #0056b3;
+  background-color: #0015b3;
+}
+.reset-btn{
+  background-color: burlywood;
+}
+.reset-btn:hover{
+  background-color: red;
 }
 
-.delete-btn {
-  background-color: #dc3545;
-  padding: 5px 10px;
-  font-size: 12px;
-}
-
-.delete-btn:hover {
-  background-color: #c82333;
-}
-
-.reset-btn {
-  background-color: #6c757d;
-}
-
-.reset-btn:hover {
-  background-color: #545b62;
-}
-
-.message {
-  padding: 10px;
-  border-radius: 4px;
-  margin-bottom: 15px;
-  display: none;
-}
-
-.success {
-  background-color: #d4edda;
-  color: #155724;
-  border: 1px solid #c3e6cb;
-}
-
-.error {
-  background-color: #f8d7da;
-  color: #721c24;
-  border: 1px solid #f5c6cb;
-}
-
-/* Product Grid */
-.products-section h2 {
-  margin-bottom: 20px;
-  color: rgba(red, green, blue, alpha);
+h2 {
+  font-weight: bold;
+  padding: 20px;
   text-align: center;
+  -webkit-text-fill-color: rgba(17, 15, 15, 0.85) ;
 }
 
 .products-grid {
@@ -120,58 +89,6 @@ button:hover {
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
   gap: 20px;
 }
-
-.product-card {
-  background: white;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  overflow: hidden;
-  transition: transform 0.2s;
-}
-
-.product-card:hover {
-  transform: translateY(-2px);
-}
-
-.product-image {
-  width: 100%;
-  height: 200px;
-  object-fit: cover;
-}
-
-.product-info {
-  padding: 15px;
-}
-
-.product-title {
-  font-size: 16px;
-  font-weight: bold;
-  color: #333;
-  margin-bottom: 8px;
-}
-
-.product-description {
-  color: #666;
-  font-size: 14px;
-  margin-bottom: 10px;
-  line-height: 1.4;
-}
-
-.product-price {
-  font-size: 18px;
-  font-weight: bold;
-  color: #007bff;
-  margin-bottom: 8px;
-}
-
-.product-brand {
-  color: #888;
-  font-size: 12px;
-  margin-bottom: 10px;
-}
-
-.loading {
-  text-align: center;
-  padding: 40px;
-  color: black;
+.products-section{
+  background-color: #FAF7F2;
 }

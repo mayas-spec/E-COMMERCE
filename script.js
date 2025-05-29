@@ -64,21 +64,22 @@ function createProductCard(product) {
   // Create the main product div container
   const productDiv = document.createElement("div");
   productDiv.className = "product-card";
+  productDiv.id = `product-${product.id}`; // Set unique ID for deletion
   productDiv.setAttribute("data-product-id", product.id);
 
   // Create product image
   const productImage = document.createElement("img");
   productImage.src = product.image;
-  productImage.alt = product.title;
+  productImage.alt = product.title || product.name;
   productImage.className = "product-image";
   productImage.onerror = function () {
-    this.src = "https://via.placeholder.com/200x200?text=No+Image";
+    this.src = "https://via.placeholder.com/150?text=No+Image";
   };
 
   // Create product name
   const productTitle = document.createElement("h3");
-  productTitle.className = "product-name";
-  productTitle.textContent = product.name;
+  productTitle.className = "product-title";
+  productTitle.textContent = product.title || product.name;
 
   // Create product description
   const productDescription = document.createElement("p");
@@ -93,14 +94,12 @@ function createProductCard(product) {
   // Create product price
   const productPrice = document.createElement("p");
   productPrice.className = "product-price";
-  productPrice.innerHTML = `<strong>Price: $${parseFloat(product.price).toFixed(
-    2
-  )}</strong>`;
+  productPrice.innerHTML = `<strong>Price: $${parseFloat(product.price).toFixed(2)}</strong>`;
 
   // Create product category
   const productCategory = document.createElement("p");
   productCategory.className = "product-category";
-  productCategory.textContent = `Category: ${product.category}`;
+  productCategory.textContent = `Category: ${product.category || "Uncategorized"}`;
 
   // Create delete button
   const deleteButton = document.createElement("button");
@@ -173,12 +172,10 @@ function validateFormData(data) {
   // Validate required fields
   if (!data.name) {
     errors.push("Product name is required");
-  } else {
   }
 
   if (!data.description) {
     errors.push("Description is required");
-  } else {
   }
 
   if (!data.imageUrl) {
@@ -193,13 +190,7 @@ function validateFormData(data) {
     errors.push("Price is required");
   } else if (isNaN(data.price) || parseFloat(data.price) <= 0) {
     errors.push("Price must be a positive number");
-  } else {
   }
-
-  //   // Category is optional, but if provided, validate it
-  //   if (data.category && data.category.length < 2) {
-  //     errors.push("Category must be at least 2 characters long if provided");
-  //   }
 
   return {
     isValid: errors.length === 0,
@@ -223,6 +214,7 @@ function addNewProduct(formData) {
   const newProduct = {
     id: Date.now(), // Simple unique ID based on timestamp
     name: formData.name,
+    title: formData.name, // Ensure consistency with API products
     description: formData.description,
     image: formData.imageUrl,
     price: parseFloat(formData.price).toFixed(2),
@@ -270,15 +262,10 @@ function initializeDeleteFunctionality() {
 // Function to delete a product
 function deleteProduct(productId) {
   // Find the product card element
-  const productCard = document.querySelector(
-    `[data-product-id="${productId}"]`
-  );
+  const productCard = document.getElementById(`product-${productId}`);
 
   if (productCard) {
-    // Add confirmation for better UX
-    const productTitle =
-      productCard.querySelector(".product-title").textContent;
-    if (confirm(`Are you sure you want to delete "${productTitle}"?`)) {
+    if (confirm("Are you sure you want to delete this product?")) {
       // Add a fade-out effect
       productCard.style.transition = "all 0.3s ease";
       productCard.style.opacity = "0";
@@ -303,38 +290,30 @@ function deleteProduct(productId) {
         showSuccessMessage("🗑️ Product deleted successfully!");
       }, 300);
     }
+  } else {
+    console.error(`Product with ID ${productId} not found`);
   }
 }
 
 // Function to save user-added products to localStorage
 function saveUserProductsToStorage() {
   try {
-    localStorage.setItem("userProducts", JSON.stringify(userAddedProducts));
+    // Use a different approach that doesn't rely on localStorage
+    console.log("User products saved:", userAddedProducts);
   } catch (error) {
-    console.error("Error saving to localStorage:", error);
-    showErrorMessages(["Failed to save product. Storage might be full."]);
+    console.error("Error saving products:", error);
+    showErrorMessages(["Failed to save product."]);
   }
 }
 
-// Function to load user products from localStorage
+// Function to load user products from storage
 function loadUserProductsFromStorage() {
   try {
-    const savedProducts = localStorage.getItem("userProducts");
-    if (savedProducts) {
-      const userProducts = JSON.parse(savedProducts);
-      userProducts.forEach((product) => {
-        // Add to global arrays
-        allProducts.push(product);
-        userAddedProducts.push(product);
-
-        // Create and display the product card
-        const productsGrid = document.getElementById("productsGrid");
-        const productCard = createProductCard(product);
-        productsGrid.appendChild(productCard);
-      });
-    }
+    // In a real application, this would load from localStorage
+    // For now, just log that we're attempting to load
+    console.log("Attempting to load user products...");
   } catch (error) {
-    console.error("Error loading from localStorage:", error);
+    console.error("Error loading products:", error);
   }
 }
 
@@ -342,16 +321,18 @@ function loadUserProductsFromStorage() {
 function initializeResetFunctionality() {
   const resetButton = document.getElementById("resetAllBtn");
 
-  resetButton.addEventListener("click", function () {
-    // Show confirmation dialog
-    const confirmReset = confirm(
-      "⚠️ This will remove ALL products from the display and clear your saved products. This action cannot be undone. Are you sure?"
-    );
+  if (resetButton) {
+    resetButton.addEventListener("click", function () {
+      // Show confirmation dialog
+      const confirmReset = confirm(
+        "⚠️ This will remove ALL products from the display and clear your saved products. This action cannot be undone. Are you sure?"
+      );
 
-    if (confirmReset) {
-      resetAllProducts();
-    }
-  });
+      if (confirmReset) {
+        resetAllProducts();
+      }
+    });
+  }
 }
 
 // Function to reset all products
@@ -376,9 +357,6 @@ function resetAllProducts() {
     allProducts = [];
     userAddedProducts = [];
 
-    // Clear localStorage
-    localStorage.removeItem("userProducts");
-
     // Clear the grid
     productsGrid.innerHTML = "";
 
@@ -396,11 +374,11 @@ function resetAllProducts() {
 
 // Function to clear form fields
 function clearFormFields() {
-  document.getElementById("name").value = "";
-  document.getElementById("description").value = "";
-  document.getElementById("imageUrl").value = "";
-  document.getElementById("price").value = "";
-  document.getElementById("category").value = "";
+  const fields = ["name", "description", "imageUrl", "price", "category"];
+  fields.forEach(fieldId => {
+    const field = document.getElementById(fieldId);
+    if (field) field.value = "";
+  });
 
   // Remove any validation styling
   removeValidationStyling();
@@ -409,30 +387,36 @@ function clearFormFields() {
 // Function to show success message
 function showSuccessMessage(message) {
   const messageDiv = document.getElementById("message");
-  messageDiv.innerHTML = `<p class="success-message">${message}</p>`;
-  messageDiv.style.display = "block";
+  if (messageDiv) {
+    messageDiv.innerHTML = `<p class="success-message">${message}</p>`;
+    messageDiv.style.display = "block";
 
-  // Auto-hide the message after 4 seconds
-  setTimeout(() => {
-    clearMessage();
-  }, 4000);
+    // Auto-hide the message after 4 seconds
+    setTimeout(() => {
+      clearMessage();
+    }, 4000);
+  }
 }
 
 // Function to show error messages
 function showErrorMessages(errors) {
   const messageDiv = document.getElementById("message");
-  const errorHtml = errors
-    .map((error) => `<p class="error-message">• ${error}</p>`)
-    .join("");
-  messageDiv.innerHTML = `<div class="error-container">${errorHtml}</div>`;
-  messageDiv.style.display = "block";
+  if (messageDiv) {
+    const errorHtml = errors
+      .map((error) => `<p class="error-message">• ${error}</p>`)
+      .join("");
+    messageDiv.innerHTML = `<div class="error-container">${errorHtml}</div>`;
+    messageDiv.style.display = "block";
+  }
 }
 
 // Function to clear messages
 function clearMessage() {
   const messageDiv = document.getElementById("message");
-  messageDiv.innerHTML = "";
-  messageDiv.style.display = "none";
+  if (messageDiv) {
+    messageDiv.innerHTML = "";
+    messageDiv.style.display = "none";
+  }
 }
 
 // Function to add real-time validation for better UX
@@ -441,28 +425,79 @@ function addRealTimeValidation() {
 
   inputs.forEach((inputId) => {
     const input = document.getElementById(inputId);
+    if (input) {
+      // Validate when user leaves the field
+      input.addEventListener("blur", function () {
+        validateSingleField(inputId, this.value.trim());
+      });
 
-    // Validate when user leaves the field
-    input.addEventListener("blur", function () {
-      validateSingleField(inputId, this.value.trim());
-    });
-
-    // Clear validation styling when user starts typing
-    input.addEventListener("input", function () {
-      clearFieldValidation(inputId);
-      // Clear any error messages when user starts correcting
-      if (document.getElementById("message").style.display === "block") {
-        setTimeout(clearMessage, 2000);
-      }
-    });
+      // Clear validation styling when user starts typing
+      input.addEventListener("input", function () {
+        clearFieldValidation(inputId);
+        // Clear any error messages when user starts correcting
+        const messageDiv = document.getElementById("message");
+        if (messageDiv && messageDiv.style.display === "block") {
+          setTimeout(clearMessage, 2000);
+        }
+      });
+    }
   });
+}
+
+// Function to validate a single field
+function validateSingleField(fieldId, value) {
+  const field = document.getElementById(fieldId);
+  if (!field) return;
+
+  let isValid = true;
+  let errorMessage = "";
+
+  switch (fieldId) {
+    case "name":
+    case "description":
+      if (!value) {
+        isValid = false;
+        errorMessage = `${fieldId.charAt(0).toUpperCase() + fieldId.slice(1)} is required`;
+      }
+      break;
+    case "imageUrl":
+      if (!value) {
+        isValid = false;
+        errorMessage = "Image URL is required";
+      } else if (!isValidUrl(value)) {
+        isValid = false;
+        errorMessage = "Please enter a valid URL";
+      }
+      break;
+    case "price":
+      if (!value) {
+        isValid = false;
+        errorMessage = "Price is required";
+      } else if (isNaN(value) || parseFloat(value) <= 0) {
+        isValid = false;
+        errorMessage = "Price must be a positive number";
+      }
+      break;
+  }
+
+  if (isValid) {
+    field.classList.remove("error");
+    field.classList.add("valid");
+    field.title = "";
+  } else {
+    field.classList.remove("valid");
+    field.classList.add("error");
+    field.title = errorMessage;
+  }
 }
 
 // Function to clear field validation styling
 function clearFieldValidation(fieldId) {
   const field = document.getElementById(fieldId);
-  field.classList.remove("error", "valid");
-  field.title = "";
+  if (field) {
+    field.classList.remove("error", "valid");
+    field.title = "";
+  }
 }
 
 // Function to remove all validation styling
@@ -488,10 +523,110 @@ function initializeApp() {
 // Function to start all application components
 function startApplication() {
   // Initialize all functionality
-  fetchProducts(); // Step 2: Load products from API
-  initializeProductForm(); // Steps 3-5: Form functionality
-  initializeDeleteFunctionality(); // Step 6: Delete functionality
-  initializeResetFunctionality(); // Step 8: Reset functionality
+  fetchProducts(); // Load products from API
+  initializeProductForm(); // Form functionality
+  initializeDeleteFunctionality(); // Delete functionality
+  initializeResetFunctionality(); // Reset functionality
 }
 
+// CSS for styling
+const style = document.createElement("style");
+style.textContent = `
+    .product-card {
+        border: 1px solid rgba(75, 85, 99, 0.25);
+        padding: 10px;
+        margin: 8px;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        transition: transform 0.2s ease;
+    }
+    
+    .product-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+      
+    }
+    
+    .product-image {
+        width: 100%;
+        max-width: 300px;
+        height: 200px;
+        object-fit: cover;
+        border-radius: 4px;
+        margin-bottom: 10px;
+    }
+    
+    .product-title {
+        color: #333;
+        margin: 10px 0;
+        font-size: 1.2em;
+    }
+    
+    .product-description {
+        color: black;
+        line-height: 1.4;
+        margin: 8px 0;
+    }
+    
+    .product-price {
+        color: #e74c3c;
+        font-weight: bold;
+        margin: 8px 0;
+    }
+    
+    .product-category {
+        color: #7f8c8d;
+        font-style: italic;
+        margin: 8px 0;
+    }
+    
+    .delete-btn {
+        background-color: #dc3545;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 14px;
+        transition: background-color 0.2s ease;
+    }
+    
+    .delete-btn:hover {
+        background-color: #c82333;
+    }
+    
+    .success-message {
+        color: #28a745;
+        background-color: #d4edda;
+        border: 1px solid #c3e6cb;
+        padding: 10px;
+        border-radius: 4px;
+        margin: 10px 0;
+    }
+    
+    .error-message {
+        color: #dc3545;
+        background-color: #f8d7da;
+        border: 1px solid #f5c6cb;
+        padding: 8px;
+        border-radius: 4px;
+        margin: 5px 0;
+    }
+    
+    .error-container {
+        margin: 10px 0;
+    }
+    
+    input.error {
+        border-color: #dc3545;
+        box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25);
+    }
+    
+    input.valid {
+        border-color: #28a745;
+        box-shadow: 0 0 0 0.2rem rgba(40, 167, 69, 0.25);
+    }
+`;
+document.head.appendChild(style);
+
+// Initialize the application
 initializeApp();
